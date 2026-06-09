@@ -1,0 +1,36 @@
+# AgentBox — GitHub Copilot CLI image
+# Multi-stage build: compile Rust binary, install Copilot CLI + Node.js on runtime.
+
+# ── Stage 1: Build ──────────────────────────────────────────
+FROM rust:1.96-slim AS builder
+
+RUN apt-get update && apt-get install -y pkg-config libssl-dev && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+COPY Cargo.toml Cargo.lock ./
+COPY crates/ crates/
+
+RUN cargo build --release --bin agentbox-wrapper
+
+# ── Stage 2: Runtime ────────────────────────────────────────
+FROM ubuntu:24.04
+
+RUN apt-get update && apt-get install -y \
+    ca-certificates curl git jq \
+    && rm -rf /var/lib/apt/lists/*
+
+# Node.js (required by Copilot CLI)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs
+
+# GitHub Copilot CLI
+RUN npm install -g @github/copilot && npm cache clean --force
+
+COPY --from=builder /build/target/release/agentbox-wrapper /usr/local/bin/agentbox-wrapper
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/agentbox-wrapper /usr/local/bin/entrypoint.sh
+
+WORKDIR /workspace
+EXPOSE 7080
+
+ENTRYPOINT ["entrypoint.sh"]

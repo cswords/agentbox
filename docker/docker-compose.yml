@@ -20,7 +20,7 @@ services:
     image: agentbox/antigravity
     build:
       context: ..
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile.agy
     environment:
       AGENTBOX_MODEL: Gemini 3.5 Flash (Low)
       AGENTBOX_YOLO: "true"
@@ -35,7 +35,7 @@ services:
     image: agentbox/antigravity
     build:
       context: ..
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile.agy
     environment:
       AGENTBOX_MODEL: Gemini 3.1 Pro (High)
       AGENTBOX_YOLO: "true"
@@ -50,7 +50,7 @@ services:
     image: agentbox/antigravity
     build:
       context: ..
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile.agy
     environment:
       AGENTBOX_MODEL: Claude Opus 4.6 (Thinking)
       AGENTBOX_YOLO: "true"
@@ -62,10 +62,10 @@ services:
 
   # ── Copilot + Claude Opus 4.6 ──────────────────────────────────
   copilot-opus46:
-    image: agentbox/antigravity
+    image: agentbox/copilot
     build:
       context: ..
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile.copilot
     environment:
       AGENTBOX_AGENT: copilot
       AGENTBOX_MODEL: claude-opus-4.6
@@ -78,10 +78,10 @@ services:
 
   # ── Copilot + Claude Opus 4.7 ──────────────────────────────────
   copilot-opus47:
-    image: agentbox/antigravity
+    image: agentbox/copilot
     build:
       context: ..
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile.copilot
     environment:
       AGENTBOX_AGENT: copilot
       AGENTBOX_MODEL: claude-opus-4.7
@@ -94,10 +94,10 @@ services:
 
   # ── Copilot + GPT-5.5 ─────────────────────────────────────────
   copilot-gpt55:
-    image: agentbox/antigravity
+    image: agentbox/copilot
     build:
       context: ..
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile.copilot
     environment:
       AGENTBOX_AGENT: copilot
       AGENTBOX_MODEL: gpt-5.5
