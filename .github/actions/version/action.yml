@@ -16,9 +16,10 @@ runs:
       id: compute
       shell: bash
       run: |
+        set +eo pipefail
         git fetch --tags --quiet
 
-        LATEST=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | grep -v -- '-rc' | head -1)
+        LATEST=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | grep -v -- '-rc' | head -1 || true)
 
         if [ -z "$LATEST" ]; then
           MINOR=1
@@ -28,7 +29,7 @@ runs:
 
         RELEASE="v0.${MINOR}.0"
 
-        LAST_RC=$(git tag --sort=-v:refname | grep "^${RELEASE}-rc" | head -1 | sed 's/.*-rc\.//')
+        LAST_RC=$(git tag --sort=-v:refname | grep "^${RELEASE}-rc" | head -1 | sed 's/.*-rc\.//' || true)
         RC_NUM=$(( ${LAST_RC:-0} + 1 ))
 
         RC="${RELEASE}-rc.${RC_NUM}"
