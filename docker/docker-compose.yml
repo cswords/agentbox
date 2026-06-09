@@ -1,8 +1,12 @@
 # AgentBox — Multi-model containerized AI agents
 #
 # Prerequisites (one-time):
-#   Extract token from macOS Keychain:
-#     security find-generic-password -s gemini -a antigravity -w | sed 's/^go-keyring-base64://' | base64 -d > ~/.gemini/antigravity-cli/antigravity-oauth-token
+#   agy:
+#     Extract token from macOS Keychain:
+#       security find-generic-password -s gemini -a antigravity -w | sed 's/^go-keyring-base64://' | base64 -d > ~/.gemini/antigravity-cli/antigravity-oauth-token
+#   copilot:
+#     gh auth login (token stored in ~/.config/gh/hosts.yml, auto-mounted)
+#     or set GH_TOKEN / GITHUB_TOKEN env var
 #
 # Usage:
 #   docker compose up -d
@@ -70,6 +74,7 @@ services:
       GITHUB_TOKEN: ${GITHUB_TOKEN:-}
     volumes:
       - ./ws-copilot-opus46:/workspace
+      - ~/.config/gh:/root/.config/gh:ro
     ports:
       - "9094:7080"
 
@@ -87,6 +92,7 @@ services:
       GITHUB_TOKEN: ${GITHUB_TOKEN:-}
     volumes:
       - ./ws-copilot-opus47:/workspace
+      - ~/.config/gh:/root/.config/gh:ro
     ports:
       - "9095:7080"
 
@@ -104,5 +110,6 @@ services:
       GITHUB_TOKEN: ${GITHUB_TOKEN:-}
     volumes:
       - ./ws-copilot-gpt55:/workspace
+      - ~/.config/gh:/root/.config/gh:ro
     ports:
       - "9096:7080"
