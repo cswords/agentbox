@@ -26,6 +26,9 @@ jobs:
           suffix: ${{ steps.tag.outputs.name }}
 
       - if: contains(steps.tag.outputs.name, '-rc')
+        uses: ./.github/actions/integration-test
+
+      - if: contains(steps.tag.outputs.name, '-rc')
         uses: ./.github/actions/draft-release
         with:
           tag: ${{ steps.tag.outputs.name }}
