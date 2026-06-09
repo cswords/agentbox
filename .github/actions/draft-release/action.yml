@@ -1,0 +1,26 @@
+name: "Create or update draft release"
+description: "Create a new draft GitHub Release, or update the existing draft"
+
+inputs:
+  tag:
+    description: "Tag name, e.g. v0.2.0-rc.1"
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        TAG: ${{ inputs.tag }}
+      run: |
+        # Check if a draft for this tag already exists
+        EXISTING=$(gh release view "$TAG" --json isDraft,name --jq 'select(.isDraft) | .name' 2>/dev/null || true)
+
+        if [ -n "$EXISTING" ]; then
+          echo "Draft release already exists for $TAG — updating."
+          gh release edit "$TAG" --draft --notes "$(git log -1 --pretty=%B)"
+        else
+          echo "Creating draft release for $TAG."
+          gh release create "$TAG" --draft --title "$TAG" --notes "$(git log -1 --pretty=%B)"
+        fi

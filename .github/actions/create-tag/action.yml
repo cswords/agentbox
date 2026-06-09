@@ -1,0 +1,18 @@
+name: "Create and push git tag"
+description: "Create an annotated git tag and push it"
+
+inputs:
+  tag:
+    description: "Tag name, e.g. v0.2.0-rc.1"
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        TAG: ${{ inputs.tag }}
+      run: |
+        git tag -a "$TAG" -m "$TAG"
+        git push origin "$TAG"
+        echo "Pushed tag: $TAG"
