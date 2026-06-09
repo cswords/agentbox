@@ -1,0 +1,37 @@
+[package]
+name = "agentbox-wrapper"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+tokio-util = "0.7"
+tokio-stream = "0.1"
+
+# HTTP framework
+axum = "0.8"
+tower-http = { version = "0.6", features = ["cors"] }
+
+# MCP SDK
+rmcp = { version = "1.7", features = ["server", "macros", "transport-streamable-http-server"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+schemars = "1.0"
+
+# Utilities
+anyhow = "1"
+async-trait = "0.1"
+dirs = "6"
+portable-pty = "0.9"
+uuid = { version = "1", features = ["v4"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+vt100 = "0.16"
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
+http = "1"
+http-body-util = "0.1"

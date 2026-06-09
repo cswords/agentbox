@@ -1,0 +1,57 @@
+# AgentBox — Multi-model containerized AI agents
+#
+# Prerequisites (one-time):
+#   Extract token from macOS Keychain:
+#     security find-generic-password -s gemini -a antigravity -w | sed 's/^go-keyring-base64://' | base64 -d > ~/.gemini/antigravity-cli/antigravity-oauth-token
+#
+# Usage:
+#   docker compose up -d
+#
+#   ACP: curl http://localhost:9091/agents  (or 9092, 9093)
+#   MCP: Add http://localhost:9091/mcp to your MCP client
+
+services:
+  # ── Gemini 3.5 Flash (Low) — fast, cost-effective ──────────────
+  agy-flash:
+    image: agentbox/antigravity
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      AGENTBOX_MODEL: Gemini 3.5 Flash (Low)
+      AGENTBOX_YOLO: "true"
+    volumes:
+      - ./ws-flash:/workspace
+      - ~/.gemini/antigravity-cli/antigravity-oauth-token:/host-token.json:ro
+    ports:
+      - "9091:7080"
+
+  # ── Gemini 3.1 Pro (High) — flagship reasoning ─────────────────
+  agy-pro:
+    image: agentbox/antigravity
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      AGENTBOX_MODEL: Gemini 3.1 Pro (High)
+      AGENTBOX_YOLO: "true"
+    volumes:
+      - ./ws-pro:/workspace
+      - ~/.gemini/antigravity-cli/antigravity-oauth-token:/host-token.json:ro
+    ports:
+      - "9092:7080"
+
+  # ── Claude Opus 4.6 (Thinking) — deep reasoning ────────────────
+  agy-opus:
+    image: agentbox/antigravity
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      AGENTBOX_MODEL: Claude Opus 4.6 (Thinking)
+      AGENTBOX_YOLO: "true"
+    volumes:
+      - ./ws-opus:/workspace
+      - ~/.gemini/antigravity-cli/antigravity-oauth-token:/host-token.json:ro
+    ports:
+      - "9093:7080"

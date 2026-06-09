@@ -1,0 +1,3 @@
+[workspace]
+members = ["crates/agentbox-wrapper"]
+resolver = "2"
