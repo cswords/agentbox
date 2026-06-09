@@ -1,4 +1,5 @@
 pub mod antigravity;
+pub mod copilot;
 
 use std::sync::Arc;
 
@@ -47,7 +48,12 @@ pub async fn create_driver(config: &AppConfig) -> Result<Arc<dyn AgentDriver>> {
             config.model.clone(),
             config.mcp_servers.clone(),
         )),
-        other => anyhow::bail!("Unknown agent type: {other}. Supported: antigravity"),
+        "copilot" => Arc::new(copilot::CopilotDriver::new(
+            config.workspace.clone(),
+            config.yolo,
+            config.model.clone(),
+        )),
+        other => anyhow::bail!("Unknown agent type: {other}. Supported: antigravity, copilot"),
     };
     driver.initialize().await?;
     Ok(driver)

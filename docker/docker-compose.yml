@@ -55,3 +55,54 @@ services:
       - ~/.gemini/antigravity-cli/antigravity-oauth-token:/host-token.json:ro
     ports:
       - "9093:7080"
+
+  # ── Copilot + Claude Opus 4.6 ──────────────────────────────────
+  copilot-opus46:
+    image: agentbox/antigravity
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      AGENTBOX_AGENT: copilot
+      AGENTBOX_MODEL: claude-opus-4.6
+      AGENTBOX_YOLO: "true"
+      GH_TOKEN: ${GH_TOKEN:-}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+    volumes:
+      - ./ws-copilot-opus46:/workspace
+    ports:
+      - "9094:7080"
+
+  # ── Copilot + Claude Opus 4.7 ──────────────────────────────────
+  copilot-opus47:
+    image: agentbox/antigravity
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      AGENTBOX_AGENT: copilot
+      AGENTBOX_MODEL: claude-opus-4.7
+      AGENTBOX_YOLO: "true"
+      GH_TOKEN: ${GH_TOKEN:-}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+    volumes:
+      - ./ws-copilot-opus47:/workspace
+    ports:
+      - "9095:7080"
+
+  # ── Copilot + GPT-5.5 ─────────────────────────────────────────
+  copilot-gpt55:
+    image: agentbox/antigravity
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      AGENTBOX_AGENT: copilot
+      AGENTBOX_MODEL: gpt-5.5
+      AGENTBOX_YOLO: "true"
+      GH_TOKEN: ${GH_TOKEN:-}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+    volumes:
+      - ./ws-copilot-gpt55:/workspace
+    ports:
+      - "9096:7080"

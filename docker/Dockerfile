@@ -28,6 +28,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
 # Antigravity CLI
 RUN curl -fsSL https://antigravity.google/cli/install.sh | bash
 
+# GitHub Copilot CLI (for copilot driver)
+RUN npm install -g @github/copilot
+
 # Config directory
 RUN mkdir -p /root/.gemini/antigravity-cli
 ENV PATH="/root/.local/bin:${PATH}"
