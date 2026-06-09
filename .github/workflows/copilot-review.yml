@@ -1,0 +1,29 @@
+name: "Copilot Code Review"
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  pull_request_review_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request Copilot review
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          # Give GitHub a moment to process the event
+          sleep 10
+
+          # Attempt to request Copilot as a reviewer
+          # This triggers the Copilot PR review app even if it's not a collaborator
+          gh pr edit "$PR" --add-reviewer copilot-pull-request-reviewer 2>/dev/null || true
+
+          echo "Copilot review requested for PR #$PR"
