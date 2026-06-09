@@ -13,6 +13,8 @@ runs:
       env:
         TAG: ${{ inputs.tag }}
       run: |
+        git config user.name  "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
         git tag -a "$TAG" -m "$TAG"
         git push origin "$TAG"
         echo "Pushed tag: $TAG"
