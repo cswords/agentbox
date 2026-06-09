@@ -1,13 +1,17 @@
 # AgentBox — Multi-model containerized AI agents
 #
 # Prerequisites (one-time):
-#   Extract token from macOS Keychain:
-#     security find-generic-password -s gemini -a antigravity -w | sed 's/^go-keyring-base64://' | base64 -d > ~/.gemini/antigravity-cli/antigravity-oauth-token
+#   agy:
+#     Extract token from macOS Keychain:
+#       security find-generic-password -s gemini -a antigravity -w | sed 's/^go-keyring-base64://' | base64 -d > ~/.gemini/antigravity-cli/antigravity-oauth-token
+#   copilot:
+#     gh auth login (token stored in ~/.config/gh/hosts.yml, auto-mounted)
+#     No env var needed — Copilot CLI reads the mounted gh config directly.
 #
 # Usage:
 #   docker compose up -d
 #
-#   ACP: curl http://localhost:9091/agents  (or 9092, 9093)
+#   ACP: curl http://localhost:9091/agents  (or 9092–9096)
 #   MCP: Add http://localhost:9091/mcp to your MCP client
 
 services:
@@ -55,3 +59,51 @@ services:
       - ~/.gemini/antigravity-cli/antigravity-oauth-token:/host-token.json:ro
     ports:
       - "9093:7080"
+
+  # ── Copilot + Claude Opus 4.6 ──────────────────────────────────
+  copilot-opus46:
+    image: agentbox/antigravity
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      AGENTBOX_AGENT: copilot
+      AGENTBOX_MODEL: claude-opus-4.6
+      AGENTBOX_YOLO: "true"
+    volumes:
+      - ./ws-copilot-opus46:/workspace
+      - ~/.config/gh:/root/.config/gh:ro
+    ports:
+      - "9094:7080"
+
+  # ── Copilot + Claude Opus 4.7 ──────────────────────────────────
+  copilot-opus47:
+    image: agentbox/antigravity
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      AGENTBOX_AGENT: copilot
+      AGENTBOX_MODEL: claude-opus-4.7
+      AGENTBOX_YOLO: "true"
+    volumes:
+      - ./ws-copilot-opus47:/workspace
+      - ~/.config/gh:/root/.config/gh:ro
+    ports:
+      - "9095:7080"
+
+  # ── Copilot + GPT-5.5 ─────────────────────────────────────────
+  copilot-gpt55:
+    image: agentbox/antigravity
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      AGENTBOX_AGENT: copilot
+      AGENTBOX_MODEL: gpt-5.5
+      AGENTBOX_YOLO: "true"
+    volumes:
+      - ./ws-copilot-gpt55:/workspace
+      - ~/.config/gh:/root/.config/gh:ro
+    ports:
+      - "9096:7080"
