@@ -66,22 +66,28 @@ impl AgentDriver for CopilotDriver {
         let output = cmd
             .output()
             .await
-            .context("Failed to spawn copilot — is it installed (npm i -g @github/copilot) and in PATH?")?;
+            .with_context(|| format!(
+                "Failed to spawn copilot — is it installed (npm i -g @github/copilot) and in PATH? workspace={}",
+                self.workspace
+            ))?;
 
         let stdout = String::from_utf8_lossy(&output.stdout).to_string();
         let stderr = String::from_utf8_lossy(&output.stderr).to_string();
         let duration_ms = start.elapsed().as_millis() as u64;
 
         if !output.status.success() {
-            tracing::warn!(
-                exit_code = ?output.status.code(),
+            let code = output.status.code().unwrap_or(-1);
+            tracing::error!(
+                exit_code = code,
                 stderr = %stderr,
                 "copilot exited with error"
             );
+            anyhow::bail!(
+                "copilot exited with code {code}: {stderr}",
+            );
         }
 
-        let raw = if stdout.is_empty() { stderr } else { stdout };
-        let cleaned = self.clean_output(&raw);
+        let cleaned = self.clean_output(&stdout);
 
         Ok(RunResult {
             output: cleaned,

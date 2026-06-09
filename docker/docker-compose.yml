@@ -70,8 +70,6 @@ services:
       AGENTBOX_AGENT: copilot
       AGENTBOX_MODEL: claude-opus-4.6
       AGENTBOX_YOLO: "true"
-      GH_TOKEN: ${GH_TOKEN:-}
-      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
     volumes:
       - ./ws-copilot-opus46:/workspace
       - ~/.config/gh:/root/.config/gh:ro
@@ -88,8 +86,6 @@ services:
       AGENTBOX_AGENT: copilot
       AGENTBOX_MODEL: claude-opus-4.7
       AGENTBOX_YOLO: "true"
-      GH_TOKEN: ${GH_TOKEN:-}
-      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
     volumes:
       - ./ws-copilot-opus47:/workspace
       - ~/.config/gh:/root/.config/gh:ro
@@ -106,8 +102,6 @@ services:
       AGENTBOX_AGENT: copilot
       AGENTBOX_MODEL: gpt-5.5
       AGENTBOX_YOLO: "true"
-      GH_TOKEN: ${GH_TOKEN:-}
-      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
     volumes:
       - ./ws-copilot-gpt55:/workspace
       - ~/.config/gh:/root/.config/gh:ro
