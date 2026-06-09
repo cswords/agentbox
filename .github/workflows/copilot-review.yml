@@ -18,25 +18,27 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
         run: |
           echo "Waiting for Copilot to review PR #$PR..."
-          echo "(Copilot reviews on PR open; re-review requires clicking 'Re-review' in the PR page)"
-          echo ""
 
           for i in $(seq 1 24); do
             sleep 20
 
-            REVIEWS=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/reviews" --jq '[.[] | select(.user.login == "copilot-pull-request-reviewer")] | length')
-            COMMENTS=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/comments" --jq '[.[] | select(.user.login == "Copilot") | select(.in_reply_to == null)] | length')
+            REVIEWS=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/reviews" \
+              --jq '[.[] | select(.user.login == "copilot-pull-request-reviewer")] | length')
+            COMMENTS=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/comments" \
+              --jq '[.[] | select(.user.login == "Copilot") | select(.in_reply_to == null)] | length')
 
             echo "  [$i] Reviews: $REVIEWS  Comments: $COMMENTS"
 
             if [ "$REVIEWS" -gt 0 ] || [ "$COMMENTS" -gt 0 ]; then
-              echo ""
               echo "✅ Copilot has reviewed PR #$PR"
               exit 0
             fi
           done
 
-          echo ""
-          echo "⚠️  Copilot has not reviewed yet."
-          echo "👉 Click 'Re-review' on the PR page to trigger Copilot:"
-          echo "   https://github.com/$GITHUB_REPOSITORY/pull/$PR"
+          # Copilot didn't review — post a reminder comment
+          echo "⚠️  Copilot has not reviewed yet. Posting reminder..."
+
+          gh pr comment "$PR" --body "> [!NOTE]
+          > 👉 Copilot hasn't reviewed this PR yet.
+          > Click **Re-review** on the PR page to trigger it:
+          > https://github.com/$GITHUB_REPOSITORY/pull/$PR"
