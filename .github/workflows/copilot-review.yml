@@ -3,27 +3,40 @@ name: "Copilot Code Review"
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-  pull_request_review_comment:
-    types: [created]
 
 permissions:
-  contents: read
   pull-requests: write
 
 jobs:
-  review:
+  check:
     runs-on: ubuntu-latest
     steps:
-      - name: Request Copilot review
+      - name: Wait for Copilot to finish reviewing
+        timeout-minutes: 8
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR: ${{ github.event.pull_request.number }}
         run: |
-          # Give GitHub a moment to process the event
-          sleep 10
+          echo "Waiting for Copilot to review PR #$PR..."
+          echo "(Copilot reviews on PR open; re-review requires clicking 'Re-review' in the PR page)"
+          echo ""
 
-          # Attempt to request Copilot as a reviewer
-          # This triggers the Copilot PR review app even if it's not a collaborator
-          gh pr edit "$PR" --add-reviewer copilot-pull-request-reviewer 2>/dev/null || true
+          for i in $(seq 1 24); do
+            sleep 20
 
-          echo "Copilot review requested for PR #$PR"
+            REVIEWS=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/reviews" --jq '[.[] | select(.user.login == "copilot-pull-request-reviewer")] | length')
+            COMMENTS=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/comments" --jq '[.[] | select(.user.login == "Copilot") | select(.in_reply_to == null)] | length')
+
+            echo "  [$i] Reviews: $REVIEWS  Comments: $COMMENTS"
+
+            if [ "$REVIEWS" -gt 0 ] || [ "$COMMENTS" -gt 0 ]; then
+              echo ""
+              echo "✅ Copilot has reviewed PR #$PR"
+              exit 0
+            fi
+          done
+
+          echo ""
+          echo "⚠️  Copilot has not reviewed yet."
+          echo "👉 Click 'Re-review' on the PR page to trigger Copilot:"
+          echo "   https://github.com/$GITHUB_REPOSITORY/pull/$PR"
