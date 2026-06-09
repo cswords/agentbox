@@ -6,7 +6,7 @@
 #       security find-generic-password -s gemini -a antigravity -w | sed 's/^go-keyring-base64://' | base64 -d > ~/.gemini/antigravity-cli/antigravity-oauth-token
 #   copilot:
 #     gh auth login (token stored in ~/.config/gh/hosts.yml, auto-mounted)
-#     or set GH_TOKEN / GITHUB_TOKEN env var
+#     No env var needed — Copilot CLI reads the mounted gh config directly.
 #
 # Usage:
 #   docker compose up -d

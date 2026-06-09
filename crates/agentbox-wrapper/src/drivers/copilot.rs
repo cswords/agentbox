@@ -39,15 +39,16 @@ impl CopilotDriver {
 
 #[async_trait::async_trait]
 impl AgentDriver for CopilotDriver {
-    /// Copilot CLI `-p` mode outputs plain text without TUI chrome.
-    /// We only need to strip ANSI escape sequences.
+    /// Copilot CLI `-p` mode outputs plain text.  We run the generic
+    /// pipeline (`extract_response`) to strip any ANSI / TUI chrome,
+    /// though in practice there is little to clean.
     fn clean_output(&self, raw: &str) -> String {
         output_parser::extract_response(raw)
     }
 
     async fn run_prompt(&self, prompt: &str, session_id: Option<&str>) -> Result<RunResult> {
         if session_id.is_some() {
-            anyhow::bail!("Copilot driver does not support multi-turn sessions (use session_mode=single)");
+            anyhow::bail!("Copilot driver does not support multi-turn sessions (set AGENTBOX_SESSION_MODE=single)");
         }
 
         let start = Instant::now();
