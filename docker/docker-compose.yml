@@ -11,7 +11,7 @@
 # Usage:
 #   docker compose up -d
 #
-#   ACP: curl http://localhost:9091/agents  (or 9092, 9093)
+#   ACP: curl http://localhost:9091/agents  (or 9092–9096)
 #   MCP: Add http://localhost:9091/mcp to your MCP client
 
 services:
