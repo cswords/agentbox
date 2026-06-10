@@ -1,0 +1,18 @@
+name: "Push to Main — Publish RC"
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  publish-rc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - uses: ./.github/actions/publish-rc
