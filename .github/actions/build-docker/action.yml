@@ -22,7 +22,7 @@ runs:
         context: .
         file: docker/Dockerfile.agy
         push: true
-        tags: ghcr.io/${{ github.repository_owner }}/agentbox/antigravity:${{ inputs.suffix }}
+        tags: ghcr.io/${{ github.repository }}/antigravity:${{ inputs.suffix }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
@@ -31,6 +31,6 @@ runs:
         context: .
         file: docker/Dockerfile.copilot
         push: true
-        tags: ghcr.io/${{ github.repository_owner }}/agentbox/copilot:${{ inputs.suffix }}
+        tags: ghcr.io/${{ github.repository }}/copilot:${{ inputs.suffix }}
         cache-from: type=gha
         cache-to: type=gha,mode=max

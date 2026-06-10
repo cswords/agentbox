@@ -5,7 +5,6 @@ on:
     types: [opened, synchronize, reopened]
 
 permissions:
-  contents: write
   pull-requests: write
 
 jobs:
@@ -23,7 +22,9 @@ jobs:
 
   publish-rc:
     needs: [test, copilot-review]
-    if: success()
+    if: success() && github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
