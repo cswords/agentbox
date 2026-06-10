@@ -20,8 +20,9 @@ runs:
       run: |
         # Fork PRs: GITHUB_TOKEN is read-only, Copilot can't review.
         # Bail out early — required check won't block merge on forks.
-        REPO_FULL=$(gh api "repos/$GITHUB_REPOSITORY" --jq '.fork')
-        if [ "$REPO_FULL" = "true" ]; then
+        HEAD_REPO=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR" --jq '.head.repo.full_name')
+        BASE_REPO=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR" --jq '.base.repo.full_name')
+        if [ "$HEAD_REPO" != "$BASE_REPO" ]; then
           echo "::warning::Fork PR detected — skipping Copilot review (token is read-only)"
           exit 0
         fi
