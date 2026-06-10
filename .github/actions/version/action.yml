@@ -29,7 +29,8 @@ runs:
 
         RELEASE="v0.${MINOR}.0"
 
-        LAST_RC=$(git tag --sort=-v:refname | grep -F "^${RELEASE}-rc" | head -1 | sed 's/.*-rc\.//' || true)
+        ESCAPED=$(echo "$RELEASE" | sed 's/\./\\./g')
+        LAST_RC=$(git tag --sort=-v:refname | grep "^${ESCAPED}-rc" | head -1 | sed 's/.*-rc\.//' || true)
         RC_NUM=$(( ${LAST_RC:-0} + 1 ))
 
         RC="${RELEASE}-rc.${RC_NUM}"
