@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  packages: write
 
 concurrency:
   group: publish-rc
@@ -19,4 +20,26 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
-      - uses: ./.github/actions/publish-rc
+
+      - name: Compute version
+        id: version
+        uses: ./.github/actions/version
+
+      - name: Create tag
+        uses: ./.github/actions/create-tag
+        with:
+          tag: ${{ steps.version.outputs.rc_tag }}
+
+      # Inline release steps instead of relying on tag-push event trigger.
+      # GITHUB_TOKEN does not trigger downstream workflows on git push,
+      # so release.yml (on: push: tags) would never fire from here.
+
+      - uses: ./.github/actions/build-docker
+        with:
+          suffix: ${{ steps.version.outputs.rc_tag }}
+
+      - uses: ./.github/actions/integration-test
+
+      - uses: ./.github/actions/draft-release
+        with:
+          tag: ${{ steps.version.outputs.rc_tag }}

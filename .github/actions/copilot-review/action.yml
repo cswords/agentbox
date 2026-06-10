@@ -1,5 +1,5 @@
 name: "Wait for Copilot review"
-description: "Poll GitHub API for Copilot review; post reminder comment if timeout"
+description: "Request Copilot review then poll for result; post reminder if timeout"
 
 inputs:
   timeout_minutes:
@@ -18,6 +18,14 @@ runs:
         TIMEOUT: ${{ inputs.timeout_minutes }}
         SLEEP: ${{ inputs.poll_seconds }}
       run: |
+        # Fork PRs: GITHUB_TOKEN is read-only, Copilot can't review.
+        # Bail out early — required check won't block merge on forks.
+        REPO_FULL=$(gh api "repos/$GITHUB_REPOSITORY" --jq '.fork')
+        if [ "$REPO_FULL" = "true" ]; then
+          echo "::warning::Fork PR detected — skipping Copilot review (token is read-only)"
+          exit 0
+        fi
+
         # Request Copilot as reviewer (best-effort)
         echo "Requesting Copilot review..."
         gh pr edit "$PR" --add-reviewer copilot-pull-request-reviewer 2>/dev/null || \
@@ -30,8 +38,13 @@ runs:
 
         for i in $(seq 1 $max); do
           sleep "$SLEEP"
+
+          # Use --jq to emit one .id per matching review, then wc -l to count.
+          # Avoids --paginate × --jq 'length' breaking on multi-page responses.
           REVIEWS=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/reviews" --paginate \
-            --jq '[.[] | select(.user.login | test("copilot"; "i")) | select(.commit_id == "'"$HEAD_SHA"'")] | length')
+            --jq '.[] | select(.user.login | test("copilot"; "i")) | select(.commit_id == "'"$HEAD_SHA"'") | .id' \
+            | wc -l | tr -d ' ')
+
           echo "  [$i] reviews=$REVIEWS"
           if [ "$REVIEWS" -gt 0 ]; then
             echo "✅ Copilot reviewed PR #$PR"

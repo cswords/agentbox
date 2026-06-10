@@ -29,7 +29,7 @@ runs:
 
         RELEASE="v0.${MINOR}.0"
 
-        LAST_RC=$(git tag --sort=-v:refname | grep "^${RELEASE}-rc" | head -1 | sed 's/.*-rc\.//' || true)
+        LAST_RC=$(git tag --sort=-v:refname | grep -F "^${RELEASE}-rc" | head -1 | sed 's/.*-rc\.//' || true)
         RC_NUM=$(( ${LAST_RC:-0} + 1 ))
 
         RC="${RELEASE}-rc.${RC_NUM}"
