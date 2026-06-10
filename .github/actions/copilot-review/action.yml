@@ -1,0 +1,37 @@
+name: "Wait for Copilot review"
+description: "Poll GitHub API for Copilot review; post reminder comment if timeout"
+
+inputs:
+  timeout_minutes:
+    default: "8"
+  poll_seconds:
+    default: "20"
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PR: ${{ github.event.pull_request.number }}
+        TIMEOUT: ${{ inputs.timeout_minutes }}
+        SLEEP: ${{ inputs.poll_seconds }}
+      run: |
+        max=$(( TIMEOUT * 60 / SLEEP ))
+        echo "Polling Copilot for up to ${TIMEOUT}m (${max} × ${SLEEP}s)..."
+
+        for i in $(seq 1 $max); do
+          sleep "$SLEEP"
+          REVIEWS=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/reviews" --paginate \
+            --jq '[.[] | select(.user.login | test("copilot"; "i"))] | length')
+          COMMENTS=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/comments" --paginate \
+            --jq '[.[] | select(.user.login | test("copilot"; "i")) | select(.in_reply_to == null)] | length')
+          echo "  [$i] reviews=$REVIEWS  comments=$COMMENTS"
+          if [ "$REVIEWS" -gt 0 ] || [ "$COMMENTS" -gt 0 ]; then
+            echo "✅ Copilot reviewed PR #$PR"
+            exit 0
+          fi
+        done
+
+        echo "⚠️  Timeout — posting reminder."
+        gh pr comment "$PR" --body "Copilot hasn't reviewed this PR yet. Click 'Re-review': https://github.com/$GITHUB_REPOSITORY/pull/$PR"

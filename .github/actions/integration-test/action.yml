@@ -1,0 +1,8 @@
+name: "Integration test"
+description: "Run integration tests against RC Docker images (TODO)"
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: echo "Integration tests — TODO placeholder; auto-pass for now"
