@@ -40,3 +40,5 @@ runs:
 
         echo "rc_tag=${RC}" >> "$GITHUB_OUTPUT"
         echo "release_tag=${RELEASE}" >> "$GITHUB_OUTPUT"
+
+        # TODO: parse major version from LATEST instead of hardcoding v0

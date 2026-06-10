@@ -7,6 +7,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: publish-rc
+  cancel-in-progress: false
+
 jobs:
   publish-rc:
     runs-on: ubuntu-latest
