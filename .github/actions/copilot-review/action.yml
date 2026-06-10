@@ -20,15 +20,14 @@ runs:
       run: |
         max=$(( TIMEOUT * 60 / SLEEP ))
         echo "Polling Copilot for up to ${TIMEOUT}m (${max} × ${SLEEP}s)..."
+        echo "HEAD_SHA=$HEAD_SHA"
 
         for i in $(seq 1 $max); do
           sleep "$SLEEP"
           REVIEWS=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/reviews" --paginate \
             --jq '[.[] | select(.user.login | test("copilot"; "i")) | select(.commit_id == "'"$HEAD_SHA"'")] | length')
-          COMMENTS=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/comments" --paginate \
-            --jq '[.[] | select(.user.login | test("copilot"; "i")) | select(.commit_id == "'"$HEAD_SHA"'") | select(.in_reply_to == null)] | length')
-          echo "  [$i] reviews=$REVIEWS  comments=$COMMENTS"
-          if [ "$REVIEWS" -gt 0 ] || [ "$COMMENTS" -gt 0 ]; then
+          echo "  [$i] reviews=$REVIEWS"
+          if [ "$REVIEWS" -gt 0 ]; then
             echo "✅ Copilot reviewed PR #$PR"
             exit 0
           fi
