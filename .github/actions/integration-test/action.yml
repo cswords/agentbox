@@ -5,4 +5,4 @@ runs:
   using: composite
   steps:
     - shell: bash
-      run: echo "Integration tests — TODO placeholder; auto-pass for now"
+      run: echo "::warning::Integration tests — TODO placeholder; auto-pass for now"
