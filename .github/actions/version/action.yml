@@ -16,7 +16,7 @@ runs:
       id: compute
       shell: bash
       run: |
-        set +e
+        set -e
         git fetch --tags --quiet
 
         LATEST=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | grep -v -- '-rc' | head -1 || true)

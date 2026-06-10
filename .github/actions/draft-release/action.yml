@@ -14,11 +14,9 @@ runs:
         GH_TOKEN: ${{ github.token }}
         TAG: ${{ inputs.tag }}
       run: |
-        # Check if a draft for this tag already exists
-        EXISTING=$(gh release view "$TAG" --json isDraft,name --jq 'select(.isDraft) | .name' 2>/dev/null || true)
-
-        if [ -n "$EXISTING" ]; then
-          echo "Draft release already exists for $TAG — updating."
+        # Check if a release for this tag already exists
+        if gh release view "$TAG" --json name >/dev/null 2>&1; then
+          echo "Release already exists for $TAG — updating as draft."
           gh release edit "$TAG" --draft --notes "$(git log -1 --pretty=%B)"
         else
           echo "Creating draft release for $TAG."

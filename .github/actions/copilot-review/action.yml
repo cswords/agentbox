@@ -22,9 +22,9 @@ runs:
 
         for i in $(seq 1 $max); do
           sleep "$SLEEP"
-          REVIEWS=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/reviews" \
+          REVIEWS=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/reviews" --paginate \
             --jq '[.[] | select(.user.login | test("copilot"; "i"))] | length')
-          COMMENTS=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/comments" \
+          COMMENTS=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/comments" --paginate \
             --jq '[.[] | select(.user.login | test("copilot"; "i")) | select(.in_reply_to == null)] | length')
           echo "  [$i] reviews=$REVIEWS  comments=$COMMENTS"
           if [ "$REVIEWS" -gt 0 ] || [ "$COMMENTS" -gt 0 ]; then
@@ -34,8 +34,4 @@ runs:
         done
 
         echo "⚠️  Timeout — posting reminder."
-        cat <<BODY | gh pr comment "$PR" --body-file -
-> [!NOTE]
-> 👉 Copilot hasn't reviewed this PR yet.
-> Click **Re-review**: https://github.com/$GITHUB_REPOSITORY/pull/$PR
-BODY
+        gh pr comment "$PR" --body "Copilot hasn't reviewed this PR yet. Click 'Re-review': https://github.com/$GITHUB_REPOSITORY/pull/$PR"
