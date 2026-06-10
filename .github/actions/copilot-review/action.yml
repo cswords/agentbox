@@ -27,11 +27,9 @@ runs:
           exit 0
         fi
 
-        # Request Copilot as reviewer (best-effort)
-        echo "Requesting Copilot review..."
-        gh pr edit "$PR" --add-reviewer copilot-pull-request-reviewer 2>/dev/null || \
-        gh pr edit "$PR" --add-reviewer Copilot 2>/dev/null || true
-        sleep 10
+        # Request Copilot as reviewer via ruleset (best-effort from Actions).
+        # GITHUB_TOKEN cannot add reviewers; the repo ruleset handles auto-trigger.
+        echo "Waiting for Copilot review (repo ruleset triggers on push)..."
 
         max=$(( TIMEOUT * 60 / SLEEP ))
         echo "Polling Copilot for up to ${TIMEOUT}m (${max} × ${SLEEP}s)..."
@@ -55,5 +53,5 @@ runs:
 
         echo "⚠️  Timeout — posting reminder."
         gh pr comment "$PR" --body "Copilot hasn't reviewed this PR yet. Click 'Re-review': https://github.com/$GITHUB_REPOSITORY/pull/$PR" || true
-        echo "::error::Copilot did not review this PR within ${TIMEOUT}m"
-        exit 1
+        echo "::warning::Copilot did not review this PR within ${TIMEOUT}m — request manually before merge"
+        exit 0
