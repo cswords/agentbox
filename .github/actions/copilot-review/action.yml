@@ -54,7 +54,5 @@ runs:
           fi
         done
 
-        echo "⚠️  Timeout — posting reminder."
-        gh pr comment "$PR" --body "Copilot hasn't reviewed this PR yet. Click 'Re-review': https://github.com/$GITHUB_REPOSITORY/pull/$PR" || true
         echo "::warning::Copilot did not review this PR within ${TIMEOUT}m — request manually before merge"
         exit 0
