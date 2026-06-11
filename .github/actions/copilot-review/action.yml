@@ -27,9 +27,12 @@ runs:
           exit 0
         fi
 
-        # Request Copilot as reviewer via ruleset (best-effort from Actions).
-        # GITHUB_TOKEN cannot add reviewers; the repo ruleset handles auto-trigger.
-        echo "Waiting for Copilot review (repo ruleset triggers on push)..."
+        # Trigger Copilot review by posting a comment @-mentioning Copilot.
+        # gh pr edit --add-reviewer does not work with GITHUB_TOKEN,
+        # but a PR comment @copilot reliably triggers re-review.
+        echo "Triggering Copilot review via comment..."
+        gh pr comment "$PR" --body "@copilot review" 2>/dev/null || true
+        sleep 10
 
         max=$(( TIMEOUT * 60 / SLEEP ))
         echo "Polling Copilot for up to ${TIMEOUT}m (${max} × ${SLEEP}s)..."
