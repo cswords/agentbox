@@ -28,10 +28,15 @@ runs:
         fi
 
         # Trigger Copilot review by posting a comment @-mentioning Copilot.
-        # gh pr edit --add-reviewer does not work with GITHUB_TOKEN,
-        # but a PR comment @copilot reliably triggers re-review.
-        echo "Triggering Copilot review via comment..."
-        gh pr comment "$PR" --body "@copilot review" 2>/dev/null || true
+        # Skip if a bot comment for this commit already exists (idempotent).
+        EXISTING=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --paginate \
+          --jq "[.[] | select(.user.login == \"github-actions[bot]\") | select(.body | contains(\"@copilot review\")) | select(.body | contains(\"$HEAD_SHA\"))] | length")
+        if [ "$EXISTING" -eq 0 ]; then
+          echo "Triggering Copilot review via comment..."
+          gh pr comment "$PR" --body "@copilot review ($HEAD_SHA)" 2>/dev/null || true
+        else
+          echo "Copilot review already triggered for $HEAD_SHA — skipping."
+        fi
         sleep 10
 
         max=$(( TIMEOUT * 60 / SLEEP ))
