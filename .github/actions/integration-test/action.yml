@@ -6,4 +6,4 @@ runs:
   steps:
     - shell: bash
       run: echo "::error::No integration tests implemented yet. Add tests to .github/actions/integration-test/action.yml."
-exit 1
+        exit 1

@@ -16,7 +16,7 @@ runs:
         git config user.name  "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
         # Idempotent: skip if tag already exists remotely
-        if git ls-remote --tags origin "refs/tags/$TAG" | grep -q "$TAG"; then
+        if git ls-remote --exit-code origin "refs/tags/$TAG" >/dev/null 2>&1; then
           echo "Tag $TAG already exists — skipping."
         else
           git tag -a "$TAG" -m "$TAG"
