@@ -30,7 +30,8 @@ runs:
         # Trigger Copilot review by posting a comment @-mentioning Copilot.
         # Skip if a bot comment for this commit already exists (idempotent).
         EXISTING=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --paginate \
-          --jq "[.[] | select(.user.login == \"github-actions[bot]\") | select(.body | contains(\"@copilot review\")) | select(.body | contains(\"$HEAD_SHA\"))] | length")
+          --jq '.[] | select(.user.login == "github-actions[bot]") | select(.body | contains("@copilot review")) | select(.body | contains("'"$HEAD_SHA"'")) | .id' \
+          | wc -l | tr -d ' ')
         if [ "$EXISTING" -eq 0 ]; then
           echo "Triggering Copilot review via comment..."
           gh pr comment "$PR" --body "@copilot review ($HEAD_SHA)" 2>/dev/null || true
