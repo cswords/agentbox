@@ -1,0 +1,26 @@
+name: "Create and push git tag"
+description: "Create an annotated git tag and push it"
+
+inputs:
+  tag:
+    description: "Tag name, e.g. v0.2.0-rc.1"
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        TAG: ${{ inputs.tag }}
+      run: |
+        set -e
+        git config user.name  "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        # Idempotent: skip if tag already exists remotely
+        if git ls-remote --exit-code origin "refs/tags/$TAG" >/dev/null 2>&1; then
+          echo "Tag $TAG already exists — skipping."
+        else
+          git tag -a "$TAG" -m "$TAG"
+          git push origin "$TAG"
+          echo "Pushed tag: $TAG"
+        fi

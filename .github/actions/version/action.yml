@@ -1,0 +1,45 @@
+name: "Determine next version"
+description: "Compute next RC and release tags from existing git tags"
+
+outputs:
+  rc_tag:
+    description: "e.g. v0.2.0-rc.1"
+    value: ${{ steps.compute.outputs.rc_tag }}
+  release_tag:
+    description: "e.g. v0.2.0"
+    value: ${{ steps.compute.outputs.release_tag }}
+
+runs:
+  using: composite
+  steps:
+    - name: Compute next version
+      id: compute
+      shell: bash
+      run: |
+        set -e
+        git fetch --tags --quiet
+
+        LATEST=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | grep -v -- '-rc' | head -1 || true)
+
+        if [ -z "$LATEST" ]; then
+          MINOR=1
+        else
+          MINOR=$(($(echo "$LATEST" | cut -d. -f2) + 1))
+        fi
+
+        RELEASE="v0.${MINOR}.0"
+
+        ESCAPED=$(echo "$RELEASE" | sed 's/\./\\./g')
+        LAST_RC=$(git tag --sort=-v:refname | grep "^${ESCAPED}-rc" | head -1 | sed 's/.*-rc\.//' || true)
+        RC_NUM=$(( ${LAST_RC:-0} + 1 ))
+
+        RC="${RELEASE}-rc.${RC_NUM}"
+
+        echo "latest release: ${LATEST:-none}"
+        echo "rc_tag:         ${RC}"
+        echo "release_tag:    ${RELEASE}"
+
+        echo "rc_tag=${RC}" >> "$GITHUB_OUTPUT"
+        echo "release_tag=${RELEASE}" >> "$GITHUB_OUTPUT"
+
+        # TODO: parse major version from LATEST instead of hardcoding v0

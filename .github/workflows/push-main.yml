@@ -1,0 +1,46 @@
+name: "Push to Main — Publish RC"
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  packages: write
+
+concurrency:
+  group: publish-rc
+  cancel-in-progress: false
+
+jobs:
+  publish-rc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Compute version
+        id: version
+        uses: ./.github/actions/version
+
+      - name: Create tag
+        uses: ./.github/actions/create-tag
+        with:
+          tag: ${{ steps.version.outputs.rc_tag }}
+
+      # Inline release steps instead of relying on tag-push event trigger.
+      # GITHUB_TOKEN does not trigger downstream workflows on git push,
+      # so release.yml (on: push: tags) would never fire from here.
+
+      - uses: ./.github/actions/build-docker
+        with:
+          suffix: ${{ steps.version.outputs.rc_tag }}
+
+      - uses: ./.github/actions/integration-test
+        continue-on-error: true  # TODO: remove when real tests exist
+
+      - uses: ./.github/actions/draft-release
+        with:
+          tag: ${{ steps.version.outputs.rc_tag }}

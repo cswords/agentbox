@@ -1,0 +1,36 @@
+name: "Release"
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    if: github.event.deleted == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve tag
+        id: tag
+        shell: bash
+        run: echo "name=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+
+      - uses: ./.github/actions/build-docker
+        with:
+          suffix: ${{ steps.tag.outputs.name }}
+
+      - if: contains(steps.tag.outputs.name, '-rc')
+        uses: ./.github/actions/integration-test
+        continue-on-error: true  # TODO: remove when real tests exist
+
+      - if: contains(steps.tag.outputs.name, '-rc')
+        uses: ./.github/actions/draft-release
+        with:
+          tag: ${{ steps.tag.outputs.name }}

@@ -1,0 +1,10 @@
+name: "Integration test"
+description: "Run integration tests against RC Docker images (TODO: exits 1 until implemented)"
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        echo "::error::No integration tests implemented yet. Add tests to .github/actions/integration-test/action.yml."
+        exit 1
