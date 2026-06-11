@@ -13,6 +13,7 @@ runs:
       env:
         TAG: ${{ inputs.tag }}
       run: |
+        set -e
         git config user.name  "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
         # Idempotent: skip if tag already exists remotely
