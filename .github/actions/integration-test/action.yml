@@ -5,4 +5,5 @@ runs:
   using: composite
   steps:
     - shell: bash
-      run: echo "::warning::Integration tests — TODO placeholder; auto-pass for now"
+      run: echo "::error::No integration tests implemented yet. Add tests to .github/actions/integration-test/action.yml."
+exit 1

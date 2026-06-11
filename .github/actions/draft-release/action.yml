@@ -17,8 +17,8 @@ runs:
         # Check if a release for this tag already exists
         if gh release view "$TAG" --json name >/dev/null 2>&1; then
           echo "Release already exists for $TAG — updating as draft."
-          gh release edit "$TAG" --draft --notes "$(git log -1 --pretty=%B)"
+          gh release edit "$TAG" --draft --notes-file <(git log -1 --pretty=%B)
         else
           echo "Creating draft release for $TAG."
-          gh release create "$TAG" --draft --title "$TAG" --notes "$(git log -1 --pretty=%B)"
+          gh release create "$TAG" --draft --title "$TAG" --notes-file <(git log -1 --pretty=%B)
         fi
